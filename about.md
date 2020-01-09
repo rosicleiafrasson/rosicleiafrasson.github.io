@@ -4,8 +4,8 @@ title: About
 permalink: /about/
 ---
 
-#Cientista da Computação
-#Joinville - SC 
+# Cientista da Computação
+# Joinville - SC 
 
 
 
