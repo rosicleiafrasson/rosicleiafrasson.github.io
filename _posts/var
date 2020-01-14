@@ -1,0 +1,148 @@
+---
+layout: post
+title: Local Variable Type Inference
+---
+
+Local Variable Type Inference é um recurso que foi introduzido no Java 10 e que está detalhado na JEP 286, com o intuito de melhorar a legibilidade, reduzindo a verbosidade presente nas declarações de variáveis, usando a palavra var em oposição a tipagem explícita. O uso de var reduz o código repetitivo, enquanto mantém a verificação dos tipos em tempo de compilação.
+// explicar o que é var e dar um exemplo
+
+{% highlight java %}
+var users = new ArrayList<User>();
+{% endhighlight %}
+
+Neste artigo eu vou explicar onde var pode ser usada e onde não é possível. Quais são os impactos na leibilidade
+Como o próprio nome sugere, esse recurso pode ser usado apenas para a declaração de variáveis locais - Local Variable - e o tipo da variável será inferido pelo compilador - Type Inference - ao invés de ser declarado explicitamente. Desse modo, esse recurso tem uso restrito a variáveis locais com inicializadores.
+
+Isso significa que Java continua sendo uma linguagem tipada e devem haver informações suficientes para o compilador inferir o tipo da variável.
+
+## Substituindo declarações de tipos com var
+
+Nós, desenvolvedores Java estamos acostumados a digitar o tipo da variável duas vezes. A primeira delas na declaração da variável e depois quando o construtor do objeto é chamado.
+
+```
+URL codefx = new URL("http://codefx.org");
+```
+
+Frequentemente, nós também declaramos tipos para variáveis que serão usadas uma única vez e normalmente na linha subsequente.
+
+```
+URL codefx = new URL("http://codefx.org");
+URLConnection connection = codefx.openConnection();
+Reader reader = new BufferedReader(
+    new InputStreamReader(connection.getInputStream()));
+
+```
+
+Isso não é algo terrível, mas é redundante. Obviamente as IDEs ajudam bastante e o desenvolvedor não precisa digitar toda essa quantidade de código. Mas é notória que a legibilidade do código fica um pouco afetada.
+
+A partir do Java 10, nós desenvolvedores podemos optar por deixar que o compilador seja responsável por inferir o tipo usando var. O código exibido acima, poderia ser escrito dessa forma:
+
+//colocar o código com var
+
+Ao encontrar uma variável usando var, o compilador vai olhar para o lado direito da declaração, onde fica o inicializador da variável e usa o tipo do inicializador para a variável. O tipo fica gravado no bytecode do .class gerado
+
+//colocar o .class do mesmo exemplo
+
+Obviamente, você vai digitar menos caracteres ao usar var. Apesar disso, o maior o benefício do seu uso está na legibilidade e não na quantidade de código que você vai deixar de digitar. Além do mais, os nomes das variáveis ficam perfeitamente alinhados, o que facilita muito a leitura.
+
+
+
+## Java continua sendo uma linguagem tipada
+
+Mesmo com o surgimento de var, Java continua sendo uma linguagem tipada. O compilador infere todos os tipos e os coloca nos .class gerados como se você tivesse digitado.
+
+// colocar um exemplo de .class
+
+Esse é o mesmo resultado que se você tivesse digitado todos os tipos.
+
+Vale enfatizar que é o compilador que infere os tipos e em tempo de execução nada mudou. Desse modo, não existe impacto de desempenho. 
+
+## Onde usar var?
+
+O nome da JEP 286 é muito sugestivo: local-variable type inference. Isso mesmo, podemos usar var em variáveis locais. O que inclui variáveis dentro de métodos, índices de loop e expressões lambda.
+
+Variáveis declaradas com var, precisam ser inicializadas. E a inicialização deve ocorrer na mesma instrução. Isso significa que as duas variáveis declaradas a seguir, não funcionam.
+
+```
+var name;
+var age;
+age = 10;
+```
+
+
+
+
+```
+ var data = new ArrayList<Map>();
+        data.add(Map.of("key1", "value1", "key2", "value2"));
+        data.add(Map.of("key11", "value11", "key22", "value22"));
+        System.out.println(data);
+ 
+        System.out.println("********** As iteration variable in enhanced for-loop ***************");
+        for ( var object : data){
+            System.out.println(String.format("%s of type %s", object, object.getClass().getName()));
+        }
+ 
+        System.out.println("********** As looping index in for-loop ***************");
+        for ( var i = 0 ; i < data.size(); i++ ){
+            var object = data.get(i);
+            System.out.println(String.format("%s of type %s", object, object.getClass().getName()));
+        }
+ 
+        System.out.println("********** As a return value from another method ***************");
+        var anInteger = someAnotherMethod();
+        System.out.println("someAnotherMethod returned " + anInteger);
+ 
+    }
+ 
+    //As a return value in a method
+    public static Integer someAnotherMethod(){
+        System.out.println("someAnotherMethod called");
+        var returnObj = 12;
+        return returnObj;
+    }
+```
+
+```
+ //Not permitted in class fields
+    //var someProperty;
+ 
+    //Not allowed as parameter for constructor
+    // public LocalVarInferenceDemo(var param1){
+ 
+    // }
+    
+     //Not allowed in catch parameter
+        // try{
+        //     //some operations
+        // }catch(var ex){
+ 
+        // }
+    }
+ 
+    //Not permitted below
+    //public static void someMethod(var param1, var param2){
+    //   System.out.println("Some method called");
+    //}
+ 
+    //Not permitted in method return type
+    // public static var someAnotherMethod2(){
+    //     System.out.println("someAnotherMethod called");
+    //     var returnObj = 12;
+    //     return returnObj;
+    // }
+```
+
+
+
+Não é possível usar var para declarar variáveis de classe, parâmetros e tipos de retornos de métodos.
+
+## Quais os benefícios de usar var
+
+O uso de var permite que os desenvolvedores escrevam código mais legível, pois reduz a redundância de declarações de tipos explícitas e faz com que coisas mais importantes como os nomes das variáveis se destaquem. 
+
+## E o legado, como fica
+Caso seu código antigo tenha var como nome de variáveis ou métodos, não se preocupe. Na migração para o Java 10 ele não quebrará. Tecncamente var não é uma palavra chave,mas um 'reserved type name', isso significa que ele pode ser usado apenas em lugares onde o compilador espera um nome de tipo, em qualquer outro lugar ele não é um identificador válido.
+
+Agora, se você possui classes chamadas var, eles não vão mais funcionar após a migração para o Java 10. Mas convenhamos, isso não ocorre com frequência.
+
