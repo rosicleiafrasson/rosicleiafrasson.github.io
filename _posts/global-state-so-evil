@@ -1,1 +1,158 @@
+Por que usar objetos globais e estáticos não é uma boa ideia
 
+O que existe de errado com variáveis globais
+
+variável global é uma variável que pode ser acessada e modificada em todo o software ou em grande parte dele.
+
+variáveis globais são alocações de memória que são diretamente visíveis em todas as partes do sistema.
+
+uma variável global é acessada diretamente pelo nome ao invés de ser passada como parâmetro. Em oposição, variáveis não globais são visíveis em um módulo em particular ou em um conjunto de métodos relacionados. 
+
+variáveis globais aumentam o acoplamento entre os módulos, aumentam o risco de bugs devido a interferência entre os módulos e aumentam o risco de problemas de concorrência.
+
+O uso indiscriminado de variáveis globais pode aumentar a complexidade e produzir bugs.
+
+O principal problema com o uso de variáveis globais é que elas criam um acoplamento implícito entre vários trechos do programa.
+Vários métodos em objetos distintos podem definir e/ou alterar valores, enquanto outros métodos podem estar lendo.
+
+Esses acoplamentos não são bem representados no design do software 
+Este tipo de acoplamento de dados resulta em bugs difíceis de encontrar e difíceis de entender.
+
+Evite variáveis globais sempre que possível 
+Desde 1973 quando W Wulf publicou o artigo "Global Variable considered harmful", já é conhecido que usar variáveis globais é pouco indicado no desenvolvimento de softwares.
+Nas palavras do mesmo, variáveis não locais constituem um importante fator em programas difíceis de entender.
+
+Mas o que significa entender um programa? Suponha que você seja apresentado a um trecho de código, e você tenha em mãos 
+os valores que serão usados como parâmetros de netrada. Dado isso um conjunto particular de saídas é esperado.
+
+Normalmente dado um conjunto de entradas, o resultado esperado de saída é o mesmo. Existe uma correspondência entre os valores de entrada e saídas
+
+a abstração pode ser considerada como selecionar informações importantes e modelar apenas os efeitos que nós acreditamos serem relevantes para os estágios da execução.
+
+então , a complexidade de unma abstração está diretamente relacionada ao número de variáveis não locais usadas e o esforço mental necessário para formar uma abstração aumenta proporcionalmente a quantidade de variáveis globais.
+
+Variáveis globais deveriam ser evitadas ao máximo.
+
+a Definição mais simples para uma variável global é que ela tem um escopo global
+isso significa que ela pode ser acessada/modificada em qualquer lugar do programa.
+
+em outras palavras, uma variável global pode ser acessada fora do escopo em que ela foi definida
+
+as variáveis globais parecem aparecer do nada ao ler um trecho de código espcífico;
+ela não foi definida
+não está na lista de parâmetros
+não existe um jeito fácil para descobrir o que está acontecendo com ela.
+
+Em poucas palavras, porque o uso destes torna o estado do programa imprevisível.
+
+Imagine que existam vários objetos que compartilham uma mesma variável global. Se existir um método dentre esses objetos que altera o valor da variável global compartilhada, você não tem conhecimento do estado inicial quando o método é executado em outro objeto.
+
+Variáveis estáticas representam um estado global. Isso é dificil de raciocinar e dificil de testar.
+Se eu crio uma nova instância de um objeto, eu posso explanar sobre o novo estado com testes. Se você tem um código que usa variáveis estáticas ele pode estar em qualquer estado e qualquer coisa pode modificá-lo.
+
+O menor escopo de algo, é mais fácil de manter.
+Nós somos excelentes quando pensamos em coisas pequenas, mas é complexo conhecer o estado de um sistema de milhares de linhas se não existir modularidade. 
+
+Se você conseguir construir seu sistema sem o uso de globais, é muito melhor
+
+Variáveis globais podem ser acessadas por qualquer parte do sistema e seu escopo de visibilidade é global
+variáveis globais tornam dificil ou impossível o uso da composição
+
+efeitos colaterais: funções modificam variáveis globais. 
+Isso pode ser reduzido com a utilização de variáveis imutáveis. Com o uso da palavra final em Java.
+
+acesso indiscriminado: 
+
+vulnerabilidade
+
+** Sintomas de problemas
+
+* Muitas variáveis estão definidas com escopo global
+* Variáveis que são usadas dentro de um método, não são variáveis de objetos, não são definidas localmente e não sendo passadas como parâmetro.
+
+Seu uso é defensável em casos raros.
+
+O grande problema com o uso de variáveis globais é que os programas ficam desnecessariamente complexo.
+
+bugs causados pelo acoplamento camuflado entre módulos. Isso é observado quando um comportamento indevido em uma parte do código quebra coisas em outros lugares que não possuem ligação.
+
+bugs criados em um módulo, após alguma mudança em um outro módulo de coisas aparentemente não relacionadas.
+
+pode ser necessário ter variáveis globais, o risco vem com o uso de variáveis globais livremente e não usar as estratégias de mitigação disponíveis.
+
+algumas variáveis globais podem valer o risco se usadas cuidadosamente.
+
+java não possui variáveis globais, mas é possível declarar uma variável como public static e o comportamento é o mesmo de uma variável global.
+
+uma variável estática não é necessariamente uma variável global
+as variáveis estáticas recebem uma alocação permanente de memória diferentemente das variáveis dinâmicas
+O endereço de memória sozinho não determina quais outros módulos podem vê-la
+
+globais promovem acoplamento implicito.
+
+Se você quer saber o que uma global faz, você precisa procurar pela sua definição que pode ser qualquer lugar. Se você tiver sorte, vai existir uma classe com definição com todas as variáveis globais ao invés de estar escondido em um lugar obscuro;
+
+você precisa alterar o comportamento da variável, mas tem o problema de encontrar todos os lugares que a variável é usada.
+uma busca pelo texto encontrará todos os lugares em que ela é usada e você precisa ter cuidado para que a sua alteração não tenha impacto.
+
+em tempo de execução, algo está mudando a variável inesperadamente, e você não sabe como isso está acontecendo. Porque a variável pode ser alterada em qualquer lugar. 
+Isso significa que você vai procurar por métodos e mais métodos, isso não é algo fácil para fazer.
+
+o fato de você poder acessar uma variável global de qualquer lugar, torna dificil isolar ou identificar os lugares onde atualmente o problema ocorre.
+
+um problema realcionado é a disseminação de bugs via relacionamentos implicitos através de variáveis globais.
+
+Se você altera o código em um lugar, não existe um caminho fácil para descobrir quais outras partes do código serão afetadas.
+
+
+
+Por que variáveis globais deveriam ser evitadas quando desnecessárias
+
+código fonte é mais fácil de entender quando o escopo de elementos individuais são limitados. Variáveis globais podem ser lidas ou modificadas por qualquer parte do programa, trazendo dificuldade para relembrar ou pensar sobre todos os possíveis usos.
+
+sem controle de acesso - uma variável global pode ser acessada ou setada em qualquer parte do programa , e qualquer regra sobre o seu uso pode ser quebrada ou esquecida. Por esse motivo, a falta de controle de acesso dificulta muito a realização de segurança em situações onde você pode desejar executar código não confiável.
+
+acoplamento implicito - 
+
+concorrencia - se variáveis globais podem ser acessadas por múltiplas threads de execução, sincronização é necessária e frequentemente é negligenciada.
+
+nomes de variáveis globais estão disponíveis em todos os lugares. Você pode usar uma variável global pensando ser local ou vice versa.
+
+Ter uma ou outra variável global não é um problema. Apenas é necessário reduzir ao mínimo.
+
+Usar Singleton ao inves de uma variável global
+
+Se for realmente indispensável o uso de uma variável global, existem algumas coisas que você pode fazer para reduzir a chance de ter problemas:
+- Use uma convenção de nomes que torne fácil o reconhecimento de todas as variáveis globais
+
+Se você realmente precisa usar uma variável global, gaste um tempo para deixar isso claro e o mais documentado possível.
+
+Alguns autores sugerem ter um arquivo com todas as variáveis globais
+
+variáveis globais tornam o código dificil de manter e impedem o reúso.
+
+o grande problema com o uso de variáveis globais criam é que elas aumentam o acoplamento entre os vários componentes que as usam.
+Isso significa que a medida que o número de componentes que usam as mesmas aumenta, a complexidade das interações entre os componentes também aumenta
+Esse aumento de acoplamento faz com que defeitos sejam inseridos com maior facilidade quando são feitas alterações e também torna os defeitos mais difíceis de serem diagnosticados e corrigidos.
+O aumento de acoplamento também pode reduzir o número de opções disponíveis quando são efetuadas mudanças e podem aumentar o esforço requerido para as mudanças com a mesma frequência em que for necessário rastrear o uso das variáveis globais nos diversos módulos.
+
+a proposta do encapsulamento, prega o oposto do uso das variáveis globais que é reduzir o acoplamento para tornar o código mais fácil para entender  e as mudanças no código mais faceis e seguras, alem de ser mais facilmente testado
+Fica muito mais fácil usar teste unitário quando variáveis globais não são usadas.
+
+quando for realmente necessário o uso das mesmas, encapsule as mesmas em objetos  e deixe a responsabilidade de escrira centrada nesse objeto, apenas a leitura acessada em toda a aplicação
+
+elas impedem o reúso porque qualquer código que se refere a variável global está acoplado e não pode ser reusado sem estar acompanhado pelas variáveis globais
+
+elas tornam o código difícil de manter porque é dificil de determinar quais partes do código estão usando as variáveis globais, já que todo código pode acessar
+
+o cenário desejado é que todas as vezes que um método é chamado com os mesmos parâmetros o método fará a mesma coisa. o cenário indesejado é quando o método depende de um estado global.
+múltiplas chamdas com os mesmos argumentos produzem resultado diferentes.
+isso é claramente muito difícil de 
+
+variáveis globais tornam o programa menos modular e menos flexível
+
+
+global variable in OO
+Global variable considered harmful W Wulf
+http://www.koopman.us/
+http://www.koopman.us/bess/chap19_globals.pdf
