@@ -141,18 +141,40 @@ Fica muito mais fácil usar teste unitário quando variáveis globais não são 
 
 quando for realmente necessário o uso das mesmas, encapsule as mesmas em objetos  e deixe a responsabilidade de escrira centrada nesse objeto, apenas a leitura acessada em toda a aplicação
 
+durante a leitura do cíodigo, você geralmente assume que as variáveis são locais e não se atenta ao fato de que a alteração do valor em um pedaço de código pode alterar o sistema inteiro
+
+o uso de variáveis globais em um método/função introduz parâmetros adicionais que não são declarados na função.
+
 elas impedem o reúso porque qualquer código que se refere a variável global está acoplado e não pode ser reusado sem estar acompanhado pelas variáveis globais
 
 elas tornam o código difícil de manter porque é dificil de determinar quais partes do código estão usando as variáveis globais, já que todo código pode acessar
 
 o cenário desejado é que todas as vezes que um método é chamado com os mesmos parâmetros o método fará a mesma coisa. o cenário indesejado é quando o método depende de um estado global.
 múltiplas chamdas com os mesmos argumentos produzem resultado diferentes.
-isso é claramente muito difícil de 
+isso é claramente muito difícil de trabalhar, porque se você suspeitar que um método não está fazendo o que supostamente deveria fazer, você não pode testar esse comportamento em qualquer lugar.
+Você precisa testar exatamente o mesmo cenário que você está trabalhando e então você precisa pensar em todos os cenários e você pode esquecer de algum importante
 
 variáveis globais tornam o programa menos modular e menos flexível
+
+fragilidade dp código: uma função que depende de variáveis globais é extremamente dependente do ambiente.
+Utilizar uma função dependente de variáveis globais é inviabilizar sua reutilização e correr o risco de invocà-la e não ter o comportamento esperado 
+
+dificulta testes: No contexto de testes unitários, qualquer função que dependa de variáveis globais para funcionar
+requer que o ambiente global seja recriado
+
+Quando diferentes partes do código acessam a mesma variável global, você acaba acoplando grande parte do seu código , ficando dificil a modularização - reutilizar uma parte do código
+
+variáveis gloabis podem ser convenientes em pequenos programas, mas elas rapidamente se tornam perigosas quando os softwares crescem.
+
+porque uma variável global pode ser alterada em qualquer parte do programa em qualquer momento
+
+
+em linguagens orientadas a objetos, como java nós não temos algo que nós chamamos de variável global. 
+ao invés disso nós temos variáveis estáticas públicas ou singletons que permiter fazer a mesma coisa que uma variável global faz
 
 
 global variable in OO
 Global variable considered harmful W Wulf
 http://www.koopman.us/
 http://www.koopman.us/bess/chap19_globals.pdf
+JavaScript The Good Parts
