@@ -1,137 +1,155 @@
-- deve ser uma preview feature no Java 14, com lançamento em março
 
-- em Java, é necessário escrever muito código para que uma classe seja usável:
-toString
-hashCode e equals
-métodos getters
-um construtor público
+# Records no Java 14
 
-Para uma simples classe, esses métodos são chatos, repetitivos e o tipo de coisa que pode facilmente ser gerada mecanicamente por uma IDE, e até o momento a linguagem não provê um caminho para fazer isso.
+- O que justifica a criação de um novo tipo em Java;
+- O que é um Record;
+- Classe java.lang.Record;
+- Tirando proveito do novo tipo record;
+- Como ficam as coisas por baixo dos panos;
 
-Esse gap é atualmente frustrante, principalmente quando você está lendo o código de alguém e parece que o autor está usando o gerador da IDE e usou todos os campos da classe, mas como você ter certeza sem checar cada linha da implementação? O que acontece se um campo foi adicionado durante um refactoring e os métodos não foram rejerados.
+É possível observar nas últimas versões do Java, que esforços com o intuito de reduzir a verbosidade da linguagem tem sido constantes. No Java 14, que deve ser lançado em março deste ano, não será diferente. Liderada por Brian Goetz, a JEP 359, que será liberada como feature preview provê uma sintaxe compacta para declaração de classes imutáveis em Java. 
 
-Será que todo esse código declarado é relamente necessário? 
+Nossos projetos Java, normalmente contém uma infinidade de classes que representam modelos do domínio e que servem para fazer persistência em base de dados. A estrutura desse tipo de classe é sempre composta por uma lista de atributos, construtores, métodos de acesso, métodos equals, hashCode e toString. Enfim, código repetitivo, de baixo valor e que está muito propenso a erro em refatorações. 
 
-O objetivo dos records é extender a sintaxe da linguagem e criar um caminho para dizer que a classe são os campos, apenas os campos e nada além dos campos. Você faz a declaração sobre a classe, o compilador pode ajudar criando todos os métodos automaticamente e tem todos os campos participantes em métodos como o hashCode.
-
-O novo conceito é chamado de record
-
-cada componente gera um campo final e um método de acesso para o valor
-
-Para desabilitar a criação de novas instâncias de um record, um construtor chamado de canonical constructor é gerado, que tem uma lista de parâmetros que é a mesma declarada no estado.
-
-Para usar um record, o programador precisa declarar os nomes dos componentes e os tipos que compõe um record.
-
-Para acessar a nova feature com a preview flag em qualquer código que declara record: javac --enable-preview -source 14 NovaClasse.java
-
-analisar o código gerado com os métodos criados
-
-os métodos toString é implementado usando o mecanismo invokedynamic-based
-
-você pode perceber que existe uma nova classe Record que atua como um supertipo para todas as classes record. Ela é abstrata e declara equals, hashcode e toString como métodos abstratos
-
-Java é muito verboso e tem muita cerimônia
-
-Escrever uma classe de dados tem baixo valor, é repetitivo e é propendo a erros: construtores, métodos de acesso , equals, hashCode e ToString.
-
-IDEs podem ajudar a escrever esse tipo de código
-
-A classe Record não pode ser diretamente extendida. Você pode tentar compilar e verificar o erro que ocorre
-
-A única forma de usar record é declarando explicitamente um e deixar o compilador criar o arquivo de classe. Essa abordagem também que garante que todas as classes de registro são criados como final.
-
-Automaticamente um record adquire alguns membros:
-- um campo private final para cada componente declarado
-- um método de acesso público para cada componente com o mesmo nome e tipo declarado
-- um construtor público com a mesma assinatura da descrição do estado, que inicializa cada campo com o seu argumento correpondente
-- implementações de equals e hashCode que dizem se dois registros são iguais se eles tem o mesmo tipo e contêm o mesmo estado
-- uma implementação de tostring que inclui uma representação em string de todos os componentes do registro com seus nomes
-
-Records não podem extender outra classe e não é possível declarar campos que não sejam os campos finais privados que correspondem aos componentes da declaração.
-Podem ser declarados outros componentes estáticos
-
-Records são implicitamente final e não podem ser abstratos. Isso significa que um record não pode ser aprimorado posteriormente por outra classe ou por outro record.
-
-Os componentes de um record são implicitamente final.
-
-Exceto as restrições listadas, records comportam-se como qualquer outra classe: eles podem ser genericos, eles podem implementar interfaces e eles são instanciados via palavra chave.
-
-O corpo do record pode declarar métodos estáticos, campos estáticos, inicializadores estáticos, construtores
+Você pode pensar... Mas as IDEs geram esse amontoado de código. Sim, elas geram. Mas você tem que concordar com dois pontos: o primeiro deles é que quando é feito um refactoring, é muito comum esquecermos de regerar; e o segundo, é que estamos falando de um amontoado de código para ler e entender e mesmo sendo gerado automaticamente, em caso de bugs, comportamentos inesperados é necessario analizar.
 
 
+## O que é um Record
 
-Como um enum, um record é uma forma restrita de classe. 
+Um record é um tipo de classe que serve para modelar classe de dados, Outras linguagens como Kotlin e Scala possuem tipos similares. Ao declarar um tipo como record, o desenvolvedor expressa a intenção que o novo tipo de dado, serve para representar dados.
 
-Um record tem um nome e uma descrição do estado. A descrição do estado declara os componentes de um record.
+A sintaxe para declarar um record é muito simples, se compararmos com uma declaração habitual de uma classe, onde normalmente é necessário sobrescrever os métodos equals e hashCode, métodos de acesso e construtores.
 
-Records obedecem um contrato especial a respeito do método equals
+Como já mencionado, records são uma preview feature language, isso significa que embora esteja totalmente implementada, ela ainda não é um padrão na JDK e é necessário habilitar o compilador para usar com: javac --enable-preview --release 
+
+
+## Classe Record
+
+A classe Record está definida no pacote java.lang e está ilustrada a seguir. Como é uma preview feature, existe a possibilidade de ser atualizada ou até mesmo removida nas próximas versões do Java. 
+
+```
+package java.lang;
+
+@jdk.internal.PreviewFeature(feature=jdk.internal.PreviewFeature.Feature.RECORDS,
+                             essentialAPI=true)
+public abstract class Record {
+
+    protected Record() {}
+
+    @Override
+    public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract String toString();
+}
+```
+
+Record é uma classe abstrata e todas as classes que extenderem de Record, devem possuir obrigatoriamente os seguintes membros:
+- um campo final e private para cada componente declarado, com o mesmo nome e mesmo tipo;
+- um construtor público, chamado de canonical constructor, que inicializa cada campo com o seu argumento correpondente e impede a criação de novos construtores;
+- um método de acesso público com o mesmo nome declarado e retorna o mesmo tipo para cada componente.
+- método equals que deve obedecer um contrato especial, onde:  
+```
 R copy = new R(r.c1(), r.c2(), ..., r.cn());
-r.equals(copy) é true
+``` 
+isso significa que ```r.equals(copy)``` será verdadeiro;
+- método hashCode que é implementado usando usando a combinação do valor de código hash de todos os componentes;
+- método toString que retorna o nome da classe, o nome e o valor de cada componente.
 
-você pode sempre usar a API publica e o canonical constructor para serializar e deserializar records
 
-se eu declarar dois records com o mesmo tipo e a mesma ordem, o que acontece?
+## Usando um record
 
-como declarar um construtor compacto
+Para usar um record, é necessário declarar explicitamente um e deixar o compilador criar o arquivo de classe. Na declaração, também é necessário especificar seus componentes, com os seus respectivos tipos.
 
-Records, provê uma sintaxe compacta para declarar classes com dados imutáveis
+A título de exemplo, vamos declarar um record com o nome de PhoneNumber, com dois componentes: prefix e number, os dois do tipo String.
 
-Deve ser fácil e conciso declarar classes imutáveis.
+```
+public record PhoneNumber(String prefix, String number) {}
+```
 
-Records é um novo tipo
+O .class de PhoneNumber é o seguinte: 
 
-ele representa uma forma restrita de declarar uma classe ( como os enums).
+```
+public final class PhoneNumber extends java.lang.Record {
+    private final java.lang.String prefix;
+    private final java.lang.String number;
 
-Records ainda são classes, mas elas são restritas, por exemplo, elas podem conter anotações e terem campos, métodos e construtores declarados como estáticos.
-Mas eles não podem extender outras classes 
+    public PhoneNumber(java.lang.String prefix, java.lang.String number) { /* compiled code */ }
 
-Record compacta a sintaxe de declaração de classe.
+    public java.lang.String toString() { /* compiled code */ }
 
-atualmente, é necessário escrever muito código repetitivo para uma classe de dados: construtores, métodos de acesso, equals, hashCode, ToString.
-Para evitar esse código repetitivo, Java está planejando usar records.
+    public final int hashCode() { /* compiled code */ }
 
-antes
-final class Point {
-    private final int x;
-    private final int y;
+    public final boolean equals(java.lang.Object o) { /* compiled code */ }
 
-    public Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+    public java.lang.String prefix() { /* compiled code */ }
 
-    // state-based implementations of equals, hashCode, toString
-    // nothing else
+    public java.lang.String number() { /* compiled code */ }
+}
+```
 
-depois
-record Point(int x, int y) { }
+Note que foi gerada uma classe final que indica não ser possível a criação de subclasses a partir dela. E ela extende de Record, que é a classe base de todos os records e que possui os métodos abstratos que o compilador implementou.
 
-Limitações
-- Records não podem extender de outra classe e não é possível declarar campos que não sejam do tipo final 
-- Records implicitamente são do tipo final 
+Nessa classe temos prefix e number como atributos final. O construtor criado também possui como argumentos os dois componentes e temos dois métodos de acesso com os mesmos nomes. O construtor gerado é equivalente a:
 
-Levando em conta esse novo tipo, dois novos métodos foram adicionados em java.lang.Class RecordComponent[] getRecordComponents() e boolean isRecord()
+```
+public PhoneNumber(java.lang.String prefix, java.lang.String number) {
+    this.prefix = prefix;
+    this.number = number;
+}
+```
 
-Um Record é basicamente uma data class, que pode ser entendida como um tipo especial de classe que se destina a conter dados.
+Por este motivo, instanciar um tipo record, é exatamente igual a instanciar qualquer outra classe Java. 
 
-Para declarar um tipo como um Record, o desenvolvedor está claramente expressando sua intenção que o tipo representa apenas dado.
+```
+PhoneNumber phoneNumber = new PhoneNumber("048", "36466128");
+```
 
-A sintaxe para declarar um record é muito simples e concisa, se compararmos a uma declaração norm al de classe onde tipicamente é necessário implementar métodos como equals e hashCode
+Para acessar um atributo da classe, é um pouco diferente do que estamos habituados, já que os métodos de acesso não possuem o prefixo get.
 
-Records parecem ser uma escolha interessante quando modelamos coisas como classes de modelo de domínio( potencialmente para ser persistida via ORM ou DTOs - data transfer objects)
+```
+phoneNumber.number();
+```
 
-um bom caminho para pensar em como records são implementados na linguagem é relembrar os enums. Um enum também é uma classe com uma semântica especial com uma sintaxe mais agradável.
-Como ainda são classes, muitas das funcionalidades disponíveis em classes são preservadas, então existe um equilíbrio entre simplicidade e flexibilidade nesse design.
+O método equals também funciona um pouco diferente, já que ele obedece um contrato especial, já discutido anteriormente. Note:
 
-Records são uma feature preview, isso significa que apesar de estar totalmente implementada, ainda não está padronizada na JDK e pode ser usada apenas ativando a flag.
-Preview feature language podem ser atualizadas e até mesmo removidas em futuras versões.
+```
+PhoneNumber phoneNumber1 = new PhoneNumber("048", "36466128");
+PhoneNumber phoneNumber2 = new PhoneNumber("048", "36466128");
 
-não esqueção de habilitar a o enable preview no momento de compilar
-> javac --enable-preview --release 14 Person.java
-2
-Note: Person.java uses preview language features.
-3
-Note: Recompile with -Xlint:preview for details.
+System.out.println(phoneNumber1.equals(phoneNumber2));
+```
+
+Esse trecho de código deve imprimir na tela o valor true. Ficou confuso? Isso acontece porque no contrato especificado em Record, Dois Records são iguais, se eles forem do mesmo tipo e os valores de seus atributos forem os mesmos. Como os Records são imutáveis, não teremos problemas com a mudança de estado durante a execução do programa.
+
+E para finalizar, temos implementado um método toString que inclui uma representação em string de todos os componentes com seus respectivos nomes e valores. A impressão de um PhoneNumber, deve ser algo similar a: PhoneNumber[prefix=048, number=36466128].
+
+## Adição de novos membros em um Record
+
+É importante salientar que Records ainda são classes. Elas podem conter anotações, métodos podem ser adicionados e variáveis estáticas podem ser criadas. Mas são classes restritas: novos atributos e construtores não são permitidos. Também não é possível extender uma classe do tipo Record.
+
+No record PhoneNumber, declarado anteriormente, foi adicionado um novo método e uma variável estática. Veja:
+
+```
+public record PhoneNumber(String prefix, String number){
+
+    private static final String DIVISOR = "-";
  
+    public String fullPhoneNumber(){
+        return prefix + DIVISOR + number;
+    }
+}
+```
+
+Outro ponto importante, é que a classe Record não pode ser diretamente extendida. Ocorre erro de compilação se existir a tentativa.
+
+
+## Considerações finais 
+
+Records introduzem na linguagem Java uma forma muito mais simples e concisa para declararmos classes de dados, sem a necessidade de escrevermos um amontoado de código verboso. Adaptar-se a este novo tipo é só questão de tempo. e que venha o Java 14.
+
 
 
