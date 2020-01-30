@@ -149,7 +149,7 @@ Outro ponto importante, é que a classe Record não pode ser diretamente extendi
 
 ## Considerações finais 
 
-Records introduzem na linguagem Java uma forma muito mais simples e concisa para declararmos classes de dados, sem a necessidade de escrevermos um amontoado de código verboso. Adaptar-se a este novo tipo é só questão de tempo. e que venha o Java 14.
+Records introduzem na linguagem Java uma forma muito mais simples e concisa para declararmos classes de dados, sem a necessidade de escrevermos um amontoado de código verboso. Adaptar-se a este novo tipo é só questão de tempo. E que venha o Java 14.
 
 
 
