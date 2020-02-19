@@ -1,11 +1,13 @@
 ---
 layout: page
-title: About
+title: Sobre mim
 permalink: /about/
 ---
 
-# Cientista da Computação
-# Joinville - SC 
+![Euzinha](image-gitpage.PNG) 
+### Cientista da Computação
+### Escritora de abobrinhas nas horas vagas
+### Joinville - SC 
 
 
 
