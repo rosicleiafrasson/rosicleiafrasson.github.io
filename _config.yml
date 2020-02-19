@@ -6,10 +6,10 @@
 name: Rosicleia Frasson
 
 # Short bio or description (displayed in the header)
-description: Iniciativa pessoal para compartilhar conhecimento relacionado a tecnologia
+description: Insights sobre desenvolvimento de software
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: 
+avatar: https://avatars3.githubusercontent.com/u/4779703?s=400&u=dabf4678300083df343fdf47dcec87f7ff4ed693&v=4
 # https://raw.githubusercontent.com/barryclark/jekyll-now/master/images/jekyll-logo.png
 
 #
@@ -23,8 +23,8 @@ footer-links:
   facebook:
   flickr:
   github: rosicleiafrasson
-  instagram:
-  linkedin:
+  instagram: rosicleiafrasson
+  linkedin: rosicl%C3%A9ia-frasson-43771a52/
   pinterest:
   rss: # just type anything here for a working RSS icon
   twitter: RosiFrasson
