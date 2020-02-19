@@ -1,3 +1,7 @@
+---
+layout: post
+title: Variáveis globais devem ser evitadas?
+---
 
 # Variáveis globais devem ser evitadas?
 
