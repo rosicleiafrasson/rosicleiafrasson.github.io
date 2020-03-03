@@ -7,7 +7,7 @@ permalink: /about/
 ![Euzinha](/images/image-gitpage.PNG) 
 
 ### Cientista da Computação
-### Escritora de abobrinhas nas horas vagas
+### Escrevo para não esquecer
 #### Joinville - SC 
 
 
